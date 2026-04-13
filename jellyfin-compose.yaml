@@ -1,0 +1,62 @@
+version: "2.1"
+
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /docker/jellyfin/config:/config
+      - /docker/data/media:/data # Centralizei a mídia para facilitar a gestão
+    ports:
+      - 8096:8096
+    devices:
+      - /dev/dri:/dev/dri # HW Acceleration
+    restart: unless-stopped
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - WEBUI_PORT=8080
+    volumes:
+      - /docker/qbittorrent/config:/config
+      - /docker/data:/data # Acesso à pasta de downloads e mídia
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /docker/radarr/config:/config
+      - /docker/data:/data # O Radarr precisa ver tanto os downloads quanto a mídia
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /docker/prowlarr/config:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
